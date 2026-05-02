@@ -1,0 +1,89 @@
+# Alpha Intelligence Hub - Master Orchestration
+# All services unified under one compose file
+
+version: '3.9'
+
+services:
+  # OpenClaw Gateway - AI Agent + Multi-Surface Messaging
+  gateway:
+    build:
+      context: ./ai/openclaw
+      dockerfile: Dockerfile
+    ports:
+      - "18789:18789"
+    volumes:
+      - ./ai/skills:/app/skills
+    depends_on:
+      - treasury
+      - world-tribe
+    environment:
+      - GATEWAY_MODE=production
+      - SKILL_PATH=/app/skills
+    restart: unless-stopped
+
+  # Quibidt 1440 Treasury Service
+  treasury:
+    build:
+      context: ./platform
+      dockerfile: Dockerfile
+    command: python src/treasury.py serve
+    ports:
+      - "8001:8001"
+    environment:
+      - QUIBIDT_MODE=collateralized
+      - TREASURY_SUPPLY=1440
+    restart: unless-stopped
+
+  # World-Tribe Protocol - On-Chain Dashboard
+  world-tribe:
+    build:
+      context: ./blockchain/world-tribe
+      dockerfile: Dockerfile
+    command: python scripts/dashboard_server.py
+    ports:
+      - "8002:8002"
+    environment:
+      - CHAIN_MODE=testnet
+    restart: unless-stopped
+
+  # Safety Kernel - Verifiable Execution Proofs
+  safety-kernel:
+    build:
+      context: ./core/safety-kernel
+      dockerfile: Dockerfile
+    command: python -m sk serve
+    ports:
+      - "8003:8003"
+    restart: unless-stopped
+
+  # Aethel Grid Validator (Rust)
+  aethel-validator:
+    build:
+      context: ./core/undermoon/aethel-grid
+      dockerfile: Dockerfile
+    command: cargo run --release
+    ports:
+      - "8004:8004"
+    restart: unless-stopped
+
+  # ALEXARAC Sovereign Platform UI
+  alexarac-ui:
+    build:
+      context: ./ai/alexarac
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+
+  # Platform Dashboard
+  dashboard:
+    build:
+      context: ./platform/dashboard
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    depends_on:
+      - treasury
+      - world-tribe
+      - safety-kernel
+    restart: unless-stopped
