@@ -58,7 +58,7 @@ echo "  Done."
 
 # --- Step 5: Merge World-Tribe-Protocol ---
 echo "[5/7] Merging World-Tribe-Protocol (on-chain layer)..."
-git remote add wtp https://github.com/iAAi33iAAi/World-Tribe-Protocol..git
+git remote add wtp https://github.com/iAAi33iAAi/World-Tribe-Protocol.git
 git fetch wtp
 git merge wtp/main --allow-unrelated-histories --no-edit -m "merge: World-Tribe-Protocol into blockchain/"
 [ -f "WorldTribe.sol" ] && git mv WorldTribe.sol blockchain/world-tribe/ 2>/dev/null || true
